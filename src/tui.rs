@@ -1,5 +1,5 @@
 use crossterm::event::{self, KeyCode};
-use ratatui::layout::Constraint;
+use ratatui::layout::{Constraint, Direction, Flex, Layout};
 use ratatui::style::*;
 use ratatui::text::*;
 use ratatui::widgets::*;
@@ -41,6 +41,11 @@ fn app(terminal: &mut DefaultTerminal) -> std::io::Result<()> {
 }
 
 fn render(frame: &mut Frame, state_struct: &StateObject) {
+    let layout = Layout::vertical([Constraint::Length(10), Constraint::Length(10)])
+        .flex(Flex::Start)
+        .spacing(2) // 2-cell gap between items
+        .split(frame.area());
+
     let main_view = Paragraph::new(
         r#"
 ░        ░░        ░░  ░░░░  ░░        ░░       ░░
@@ -48,22 +53,24 @@ fn render(frame: &mut Frame, state_struct: &StateObject) {
 ▓      ▓▓▓▓      ▓▓▓▓        ▓▓      ▓▓▓▓       ▓▓
 █  ████████  ████████  █  █  ██  ████████  ███  ██
 █  ████████        ██  ████  ██        ██  ████  █
-                                                  
-<tab>   - change theme
-<?>     - Open Menu
-<q>     - quit
-
         "#,
     )
     .style(Style::default().fg(Color::Yellow))
-    .block(
-        Block::default()
-            .borders(Borders::ALL)
-            .title(Line::from("  Femur  ").centered())
-            .border_type(BorderType::Rounded),
-    );
+    .block(Block::default().title(Line::from("  Femur  ").centered()));
 
-    frame.render_widget(main_view, frame.area());
+    let main_menu_block = Paragraph::new(
+        r#"
+        <tab>   - change theme
+        <?>     - Open Menu
+        <q>     - quit
+    "#,
+    )
+    .centered()
+    .style(Style::default().fg(Color::Yellow))
+    .block(Block::default().title(Line::from("Selection:").centered()));
+
+    frame.render_widget(main_view, layout[0]);
+    frame.render_widget(main_menu_block, layout[1]);
 
     if state_struct.menu_popup {
         let menu_block = Block::default()
