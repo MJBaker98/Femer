@@ -41,14 +41,27 @@ fn app(terminal: &mut DefaultTerminal) -> std::io::Result<()> {
 }
 
 fn render(frame: &mut Frame, state_struct: &StateObject) {
-    let main_view = Paragraph::new("Hello, World!")
-        .style(Style::default().fg(Color::Yellow))
-        .block(
-            Block::default()
-                .borders(Borders::ALL)
-                .title("  Femer  ")
-                .border_type(BorderType::Rounded),
-        );
+    let main_view = Paragraph::new(
+        r#"
+░        ░░        ░░  ░░░░  ░░        ░░       ░░
+▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒   ▒▒   ▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒
+▓      ▓▓▓▓      ▓▓▓▓        ▓▓      ▓▓▓▓       ▓▓
+█  ████████  ████████  █  █  ██  ████████  ███  ██
+█  ████████        ██  ████  ██        ██  ████  █
+                                                  
+<tab>   - change theme
+<?>     - Open Menu
+<q>     - quit
+
+        "#,
+    )
+    .style(Style::default().fg(Color::Yellow))
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .title(Line::from("  Femur  ").centered())
+            .border_type(BorderType::Rounded),
+    );
 
     frame.render_widget(main_view, frame.area());
 
