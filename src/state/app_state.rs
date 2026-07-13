@@ -1,6 +1,11 @@
+/// struct to capture app state as the user interacts with the TUI
 pub struct StateObject {
     pub menu_popup: bool,
     pub theme_popup: bool,
+    pub settings_popup: bool,
+    pub about_popup: bool,
+    pub help_popup: bool,
+
     pub menu_selected: usize,
     pub location_selected: usize,
     pub menu_items: Vec<String>,
@@ -12,6 +17,9 @@ impl StateObject {
         Self {
             menu_popup: false,
             theme_popup: false,
+            settings_popup: false,
+            help_popup: false,
+            about_popup: false,
             menu_selected: 0,
             location_selected: 0,
             menu_items: vec![
@@ -34,6 +42,15 @@ impl StateObject {
 
     pub fn toggle_location(&mut self) {
         self.theme_popup = !self.theme_popup
+    }
+    pub fn toggle_settings_popup(&mut self) {
+        self.settings_popup = !self.settings_popup
+    }
+    pub fn toggle_about_popup(&mut self) {
+        self.about_popup = !self.about_popup
+    }
+    pub fn toggle_help_popup(&mut self) {
+        self.help_popup = !self.help_popup
     }
 
     pub fn move_selection_up(&mut self) {

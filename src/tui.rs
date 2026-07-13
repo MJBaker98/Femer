@@ -5,7 +5,8 @@ use ratatui::text::*;
 use ratatui::widgets::*;
 use ratatui::{DefaultTerminal, Frame};
 
-use crate::modes::StateObject;
+use crate::file_utils::file_io;
+use crate::state::app_state::StateObject;
 
 pub fn run() -> color_eyre::Result<()> {
     color_eyre::install()?;
@@ -26,11 +27,24 @@ fn app(terminal: &mut DefaultTerminal) -> std::io::Result<()> {
                 KeyCode::Up => state_struct.move_selection_up(),
                 KeyCode::Down => state_struct.move_selection_down(),
                 KeyCode::Enter => {
-                    // Handle selection - for now just close the popup
-                    if state_struct.menu_popup {
-                        state_struct.toggle_menu();
-                    } else if state_struct.theme_popup {
-                        state_struct.toggle_location();
+                    // unwrap string from menu
+                    if let Some(selected_item) = state_struct.get_selected_item() {
+                        if state_struct.menu_popup {
+                            match selected_item {
+                                "Settings" => state_struct.toggle_settings_popup(),
+                                "About" => state_struct.toggle_about_popup(),
+                                "Help" => state_struct.toggle_help_popup(),
+                                _ => {}
+                            }
+                        } else if state_struct.theme_popup {
+                            match selected_item {
+                                "Dayfox" => {}
+                                "Tokyonight night" => {}
+                                "Catpuccin" => {}
+                                "Everforest" => {}
+                                _ => {}
+                            }
+                        }
                     }
                 }
                 KeyCode::Char('q') | KeyCode::Char('Q') => break Ok(()),
@@ -101,6 +115,7 @@ fn render(frame: &mut Frame, state_struct: &StateObject) {
 
         let area = frame.area();
         let centered_area = area.centered(Constraint::Percentage(60), Constraint::Percentage(60));
+        frame.render_widget(Clear, centered_area);
         frame.render_widget(list, centered_area);
     }
 
@@ -133,6 +148,7 @@ fn render(frame: &mut Frame, state_struct: &StateObject) {
 
         let area = frame.area();
         let centered_area = area.centered(Constraint::Percentage(60), Constraint::Percentage(60));
+        frame.render_widget(Clear, centered_area);
         frame.render_widget(list, centered_area);
     }
 }
