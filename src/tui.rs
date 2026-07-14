@@ -7,6 +7,7 @@ use ratatui::{DefaultTerminal, Frame};
 
 use crate::file_utils::file_io;
 use crate::state::app_state::StateObject;
+use crate::state::usr_config::UserConfigDir;
 
 pub fn run() -> color_eyre::Result<()> {
     color_eyre::install()?;
@@ -15,10 +16,12 @@ pub fn run() -> color_eyre::Result<()> {
 }
 
 fn app(terminal: &mut DefaultTerminal) -> std::io::Result<()> {
+    // at startup find usr config directory and display it
     let mut state_struct = StateObject::new();
+    let mut config_dir_object = UserConfigDir::new();
 
     loop {
-        terminal.draw(|frame| render(frame, &state_struct))?;
+        terminal.draw(|frame| render(frame, &state_struct, &config_dir_object))?;
 
         if let Some(key) = event::read()?.as_key_press_event() {
             match key.code {
@@ -54,7 +57,7 @@ fn app(terminal: &mut DefaultTerminal) -> std::io::Result<()> {
     }
 }
 
-fn render(frame: &mut Frame, state_struct: &StateObject) {
+fn render(frame: &mut Frame, state_struct: &StateObject, config_dir: &UserConfigDir) {
     let layout = Layout::vertical([Constraint::Length(10), Constraint::Length(10)])
         .flex(Flex::Start)
         .spacing(2) // 2-cell gap between items
@@ -85,6 +88,17 @@ fn render(frame: &mut Frame, state_struct: &StateObject) {
 
     frame.render_widget(main_view, layout[0]);
     frame.render_widget(main_menu_block, layout[1]);
+
+    if let Some(config_dir_as_path) = config_dir.get_config_dir() {
+        let display_info_box = Paragraph::new(config_dir_as_path)
+            .centered()
+            .style(Style::default().fg(Color::Yellow))
+            .block(Block::default().title(Line::from("User Config Dir:").centered()));
+        let area = frame.area();
+        let centered_area = area.centered(Constraint::Percentage(60), Constraint::Percentage(60));
+        frame.render_widget(Clear, centered_area);
+        frame.render_widget(display_info_box, centered_area)
+    }
 
     if state_struct.menu_popup {
         let menu_block = Block::default()
