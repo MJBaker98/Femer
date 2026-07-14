@@ -58,10 +58,14 @@ fn app(terminal: &mut DefaultTerminal) -> std::io::Result<()> {
 }
 
 fn render(frame: &mut Frame, state_struct: &StateObject, config_dir: &UserConfigDir) {
-    let layout = Layout::vertical([Constraint::Length(10), Constraint::Length(10)])
-        .flex(Flex::Start)
-        .spacing(2) // 2-cell gap between items
-        .split(frame.area());
+    let layout = Layout::vertical([
+        Constraint::Length(10),
+        Constraint::Length(10),
+        Constraint::Length(5),
+    ])
+    .flex(Flex::Start)
+    .spacing(2) // 2-cell gap between items
+    .split(frame.area());
 
     let main_view = Paragraph::new(
         r#"
@@ -90,14 +94,14 @@ fn render(frame: &mut Frame, state_struct: &StateObject, config_dir: &UserConfig
     frame.render_widget(main_menu_block, layout[1]);
 
     if let Some(config_dir_as_path) = config_dir.get_config_dir() {
-        let display_info_box = Paragraph::new(config_dir_as_path)
+        let display_info_box = Paragraph::new(config_dir_as_path.to_string())
             .centered()
             .style(Style::default().fg(Color::Yellow))
             .block(Block::default().title(Line::from("User Config Dir:").centered()));
-        let area = frame.area();
-        let centered_area = area.centered(Constraint::Percentage(60), Constraint::Percentage(60));
-        frame.render_widget(Clear, centered_area);
-        frame.render_widget(display_info_box, centered_area)
+        // let area = frame.area();
+        // let centered_area = area.centered(Constraint::Percentage(60), Constraint::Percentage(60));
+        // frame.render_widget(Clear, centered_area);
+        frame.render_widget(display_info_box, layout[2])
     }
 
     if state_struct.menu_popup {

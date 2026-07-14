@@ -1,4 +1,5 @@
 use crate::file_utils::file_io::expand_tilde;
+use dirs;
 use std::env;
 use std::path::PathBuf;
 
@@ -22,14 +23,20 @@ pub struct UserConfigDir {
 
 impl UserConfigDir {
     pub fn new() -> Self {
-        let dir_path: PathBuf = PathBuf::new();
-        if let Ok(xdg_home) = env::var("XDG_CONFIG_HOME") {
-            let dir_path = PathBuf::from(xdg_home);
+        // if let Some(xdg_home) = dirs::config_dir() {
+        //     Self {
+        //         config_dir: xdg_home,
+        //     }
+        // } else {
+        //     panic!("Unable to read config home")
+        // }
+        if let Some(mut home_dir) = dirs::home_dir() {
+            home_dir.push(".config");
+            Self {
+                config_dir: home_dir,
+            }
         } else {
-            let dir_path = expand_tilde("~/.config");
-        }
-        Self {
-            config_dir: dir_path,
+            panic!()
         }
     }
 
